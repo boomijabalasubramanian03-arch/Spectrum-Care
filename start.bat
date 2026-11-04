@@ -8,23 +8,30 @@ cd /d "%~dp0"
  echo =====================================================
  echo.
 
-REM This project's pinned Pydantic stack is tested against Python 3.12.
-REM Do not let Windows silently select Python 3.14.
-py -3.12 --version >nul 2>nul
-if errorlevel 1 (
+if exist backend\venv\Scripts\python.exe (
+  echo [1/4] Using existing virtual environment.
+  goto env_ready
+)
+
+REM Check for Python 3.12 via py launcher or local install
+set "PYTHON_EXE="
+py -3.12 --version >nul 2>nul && set "PYTHON_EXE=py -3.12"
+if not defined PYTHON_EXE if exist "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" set "PYTHON_EXE=%LOCALAPPDATA%\Programs\Python\Python312\python.exe"
+
+if not defined PYTHON_EXE (
   echo Python 3.12 was not found.
   echo Please install Python 3.12.x from https://www.python.org/downloads/release/python-31210/
-  echo During installation, select "Add python.exe to PATH".
-  echo Then close and reopen this terminal and run start.bat again.
   pause
   exit /b 1
 )
 
 if not exist backend\venv\Scripts\python.exe (
   echo [1/4] Creating a Python 3.12 virtual environment...
-  py -3.12 -m venv backend\venv
+  %PYTHON_EXE% -m venv backend\venv
   if errorlevel 1 (echo Could not create the virtual environment.& pause & exit /b 1)
 )
+
+:env_ready
 
 if not exist backend\venv\.deps_installed (
   echo [2/4] Installing Python packages. Internet is needed for first-time setup.
