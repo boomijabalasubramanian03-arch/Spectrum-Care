@@ -1,0 +1,4 @@
+# Only needed if you switch to your own trained model (USE_CUSTOM_MODEL=1).
+# Not in requirements.txt by default because it pulls in PyTorch, which is
+# a much bigger download than the rest of this project needs.
+ultralytics

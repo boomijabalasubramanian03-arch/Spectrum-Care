@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless Cloud Assistant for Contextual Color Analysis and Accessibility Support
+
+Globals:
+  Function:
+    Timeout: 60
+    MemorySize: 2048
+    Environment:
+      Variables:
+        ANALYSIS_TABLE: !Ref AnalysisTable
+        RESULT_BUCKET: !Ref ImageBucket
+        CORS_ORIGIN: '*'
+
+Resources:
+  ImageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins: ['*']
+            AllowedMethods: [GET, PUT, HEAD]
+            AllowedHeaders: ['*']
+            MaxAge: 3000
+
+  AnalysisTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+
+  AnalysisFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      Dockerfile: cloud/Dockerfile
+      DockerContext: ..
+      DockerTag: chroma-context-lambda-v1
+    Properties:
+      PackageType: Image
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+        S3Upload:
+          Type: S3
+          Properties:
+            Bucket: !Ref ImageBucket
+            Events: s3:ObjectCreated:Put
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: uploads/
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref ImageBucket
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AnalysisTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - polly:SynthesizeSpeech
+              Resource: '*'
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway HTTP API endpoint
+    Value: !Sub 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com'
+  ImageBucketName:
+    Value: !Ref ImageBucket
+  AnalysisTableName:
+    Value: !Ref AnalysisTable

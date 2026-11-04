@@ -1,0 +1,4 @@
+boto3>=1.35,<2
+opencv-python-headless>=4.10,<5
+numpy>=1.26,<3
+pytesseract>=0.3.13,<1
