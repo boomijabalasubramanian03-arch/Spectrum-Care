@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getAnalysis, downloadReport } from "../api/analysis.js";
+import { resolveUrl } from "../api/http.js";
 import Sidebar from "../components/Sidebar.jsx";
 import SplitViewSlider from "../components/SplitViewSlider.jsx";
 import WardrobeContrastAdvisor from "../components/WardrobeContrastAdvisor.jsx";
@@ -114,8 +115,8 @@ export default function Results() {
     );
   }
 
-  const primaryImage = analysis.annotated_url || analysis.img_url;
-  const cvdImage = analysis.cvd_url || analysis.img_url;
+  const primaryImage = resolveUrl(analysis.annotated_url || analysis.img_url);
+  const cvdImage = resolveUrl(analysis.cvd_url || analysis.img_url);
   const currentCvdType = analysis.cvd_type || "Deuteranopia";
 
   return (

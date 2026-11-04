@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { getHistory } from "../api/analysis.js";
+import { resolveUrl } from "../api/http.js";
 import Sidebar from "../components/Sidebar.jsx";
 
 export default function History() {
@@ -117,7 +118,7 @@ export default function History() {
                 {filteredItems.map((item) => (
                   <tr key={item.ana_id}>
                     <td style={{ width: "80px" }}>
-                      <img src={item.img_url} alt="" className="history-row__thumb-lg" />
+                      <img src={resolveUrl(item.img_url)} alt="" className="history-row__thumb-lg" />
                     </td>
                     <td>
                       <span className="fw-bold d-block text-dark">

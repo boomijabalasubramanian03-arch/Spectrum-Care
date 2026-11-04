@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Sidebar from "../components/Sidebar.jsx";
+import { resolveUrl } from "../api/http.js";
 import {
   getAdminOverview,
   getAdminUsers,
@@ -310,7 +311,7 @@ export default function Admin() {
                             <td>
                               {t.img_url ? (
                                 <img
-                                  src={t.img_url}
+                                  src={resolveUrl(t.img_url)}
                                   alt="Preview"
                                   style={{
                                     width: "42px",

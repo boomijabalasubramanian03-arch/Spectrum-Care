@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Sidebar from "../components/Sidebar.jsx";
 import { getStoredUser } from "../api/auth.js";
 import { getStats } from "../api/stats.js";
+import { resolveUrl } from "../api/http.js";
 
 export default function Dashboard() {
   const user = getStoredUser();
@@ -116,7 +117,7 @@ export default function Dashboard() {
                   {stats.recent.map((item) => (
                     <tr key={item.ana_id}>
                       <td style={{ width: "70px" }}>
-                        <img src={item.img_url} alt="" className="history-row__thumb" />
+                        <img src={resolveUrl(item.img_url)} alt="" className="history-row__thumb" />
                       </td>
                       <td>
                         <span className="fw-semibold">
