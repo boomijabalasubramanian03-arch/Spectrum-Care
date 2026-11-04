@@ -19,6 +19,11 @@ log = logging.getLogger("chroma")
 
 models.Base.metadata.create_all(bind=engine)
 
+# Ensure primary admin user has admin privileges
+with engine.connect() as _conn:
+    _conn.exec_driver_sql("UPDATE users SET role = 'admin' WHERE email = 'boomi@gmail.com'")
+    _conn.commit()
+
 app = FastAPI(
     title="Serverless Cloud Assistant for Contextual Color Analysis and Accessibility Support",
     version="0.2.0",
